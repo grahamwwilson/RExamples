@@ -4,9 +4,9 @@
 # Plot power vs. sample size for a chi-squared goodness-of-fit test
 
 # Parameters
-alpha <- 0.05                    # Significance level
-p0 <- c(0.25, 0.25, 0.25, 0.25)   # Expected probabilities for 4 categories under H0
-p1 <- c(0.10, 0.20, 0.30, 0.40)   # True probabilities under H1
+alpha <- 0.05                     # Significance level
+p0 <- c(0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125)   # Expected probabilities for 4 categories under H0
+p1 <- c(0.0375,  0.0625, 0.0875, 0.1125, 0.1375, 0.1625, 0.1875, 0.2125)   # True probabilities under H1
 df <- length(p0) - 1              # Degrees of freedom
 
 df
@@ -19,8 +19,7 @@ df
 power_chisq <- function(n, p0, p1, alpha) {
   lambda <- n * sum((p1 - p0)^2 / p0)                # Noncentrality parameter
   crit <- qchisq(1 - alpha, df = length(p0) - 1)     # Critical value of the chi-squared under H0
-#  power <- 1 - pchisq(crit, df = length(p0) - 1, ncp = lambda) # Computes P (chisq > chisq_crit)
-  power <- pchisq(crit, lower.tail=FALSE, df = length(p0) - 1, ncp = lambda) # Computes P (chisq > chisq_crit)
+  power <- 1 - pchisq(crit, df = length(p0) - 1, ncp = lambda) # Computes P (chisq > chisq_crit)
   return(power)
 }
 
@@ -29,7 +28,7 @@ n_values <- seq(10, 150, by = 5)
 power_values <- sapply(n_values, power_chisq, p0 = p0, p1 = p1, alpha = alpha)
 
 # PDF output
-pdf("PowerPlot.pdf", width = 6, height = 5)
+pdf("PowerPlot2.pdf", width = 6, height = 5)
 
 # Plot
 plot(n_values, power_values, type = "l", lwd = 2, col = "blue",

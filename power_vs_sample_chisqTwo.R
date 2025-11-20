@@ -5,8 +5,8 @@
 
 # Parameters
 alpha <- 0.05                    # Significance level
-p0 <- c(0.25, 0.25, 0.25, 0.25)   # Expected probabilities for 4 categories under H0
-p1 <- c(0.10, 0.20, 0.30, 0.40)   # True probabilities under H1
+p0 <- c(0.50, 0.50)   # Expected probabilities for 2 categories under H0
+p1 <- c(0.30, 0.70)   # True probabilities under H1
 df <- length(p0) - 1              # Degrees of freedom
 
 df
@@ -29,7 +29,7 @@ n_values <- seq(10, 150, by = 5)
 power_values <- sapply(n_values, power_chisq, p0 = p0, p1 = p1, alpha = alpha)
 
 # PDF output
-pdf("PowerPlot.pdf", width = 6, height = 5)
+pdf("PowerPlotTwo.pdf", width = 6, height = 5)
 
 # Plot
 plot(n_values, power_values, type = "l", lwd = 2, col = "blue",

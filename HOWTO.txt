@@ -1,0 +1,3 @@
+Some of this R code needs you to have installed additional R libraries.
+For example
+install.packages("sn") from the R prompt.

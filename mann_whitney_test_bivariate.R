@@ -21,8 +21,8 @@ set.seed(125)   # remove or change for different random draws
 # Sample sizes
 n <- 2000
 mu <- c(0,0)
-Sigma <- matrix(c(  1, 0.5,
-                  0.5,   1 ), nrow = 2)
+Sigma <- matrix(c(  1, 0.999,
+                  0.999,   1 ), nrow = 2)
 
 library(MASS)
 xy <- mvrnorm(n = n, mu = mu, Sigma = Sigma)

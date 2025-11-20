@@ -6,8 +6,8 @@
 # ------------------------------------------------------------
 
 # Degrees of freedom
-dofs <- c(5, 10, 20)
-ncps <- c(5, 10, 20)
+dofs <- c(5, 5, 5)
+ncps <- c(0, 5, 10)
 cols <- c("red", "blue", "darkgreen")
 
 # x-range — choose a range that covers the relevant density
