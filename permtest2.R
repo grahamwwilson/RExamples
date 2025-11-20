@@ -1,0 +1,81 @@
+#!/usr/bin/env Rscript
+
+args <- commandArgs(trailingOnly = TRUE)
+
+# Default test type
+test_type <- "two.sided"
+
+# Override if user provides an argument
+if (length(args) >= 1) {
+    test_type <- args[1]
+}
+
+if (!(test_type %in% c("two.sided", "greater", "less"))) {
+    stop("Usage: ./permtest.R [two.sided|greater|less]")
+}
+
+cat(sprintf("Running permutation test (%s)\n", test_type))
+
+set.seed(124)
+
+# Number of permutations (always do 1 less than a round number
+B <- 200000 - 1
+
+# Sample data
+x <- rchisq(20, df = 100)   # Chisq with mean of 100 (variance of 200, sd=sqrt(200)=14.1)
+y <- rchisq(30, df = 115)   # Chisq with mean of 115 (variance of 230, sd=sqrt(230)=15.2)
+
+# Note 50 choose 20 is about 4.7e13.
+
+# Observed statistic
+T_obs <- mean(y) - mean(x)                         # Observed statistic   
+
+# Combine data
+z <- c(x, y)
+n1 <- length(x)
+
+# Permutation distribution
+T_perm <- replicate(B, {                           # do B MC permutations of the statistic
+    idx <- sample(z)                               # sample(z) randomly permutes (shuffles) the combined data vector z
+    mean(idx[(n1+1):length(z)]) - mean(idx[1:n1])  # computes T_perm = mean(second group) - mean(first group)
+})
+
+### --- Compute p-value (with k for error estimate) ---
+
+if (test_type == "two.sided") {
+    exceed <- abs(T_perm) >= abs(T_obs)
+} else if (test_type == "greater") {
+    exceed <- T_perm >= T_obs
+} else if (test_type == "less") {
+    exceed <- T_perm <= T_obs
+}
+
+k <- sum(exceed)
+
+# Use the +1 correction to avoid p=0 and match exact permutation logic
+p_value <- (k+1) / (B+1)
+p_se <- sqrt(p_value * (1 - p_value) / B)   # binomial SE. Here we still use the adjusted one. 
+
+# Formatted output
+cat(sprintf("Observed x mean: %.4f\n", mean(x)))
+cat(sprintf("Observed y mean: %.4f\n", mean(y)))
+cat(sprintf("Observed statistic (T_obs): %.4f\n", T_obs))
+cat(sprintf("k (number of exceedances):  %d\n", k))
+cat(sprintf("B (number of perms):        %d\n", B))
+cat(sprintf("Adjusted permutation p-value (%s): %.5f\n", test_type, p_value))
+cat(sprintf("Binomial SE on p-value:     %.6f\n", p_se))
+
+# PDF output
+pdf("permtest2.pdf", width = 6, height = 5)
+hist(T_perm, breaks = 40,
+     main = sprintf("Permutation Test (%s)", test_type),
+     xlab = "Permuted test statistic")
+abline(v = T_obs, col = "blue", lwd = 2)
+dev.off()
+
+# Double check the t test performance
+t.test(x, y, alternative = "two.sided", var.equal = TRUE)
+t.test(x, y, alternative = "two.sided", var.equal = FALSE)   # Try Welch's test too
+t.test(x, mu=100.0)
+t.test(y, mu=115.0)
+
